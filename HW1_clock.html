@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>#info {
+        position: absolute;
+        top: 2%;
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        color: #ffff00
+      }
+      
+      body {
+        overflow: hidden;
+      }
+      </style>
+</head>
+<body>
+    <div id="info">Clock Design
+        <br><br>
+        <button id = "power">Start</button>
+        <select id='method'>
+          <option value='sol1'>normal style</option>
+          <option value='sol2'>quartz style</option>
+        </select>
+        <button id='plus10'>+10second</button>
+      </div>
+      <audio id="alarm" src="mp3/Clock-sound-effect.mp3" preload="auto"></audio>
+      <script src="https://threejs.org/build/three.min.js"></script>
+      <script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+      </script>
+      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+      <script>
+        var scene, renderer, camera;
+        var angle = 0;
+        var second;
+        var strategy = 'sol1';
+        var turn = false;
+        var count = 0,
+          time_count = 0;
+        
+        var clock_turn = false;
+        
+        init();
+        animate();
+        
+        $("#method").change(function() {
+          strategy = $('#method option:selected').val();
+        });
+        
+        
+        
+        var start_time, time = 0;
+        function start() {
+            start_time = new Date();
+        }
+        function end() {
+            var now = new Date();
+            time = now - start_time;
+        }
+        
+        $('#power').mousedown(start);
+        $('#power').mouseup(end);
+          
+        
+        $('#plus10').click(function() {
+            //console.log("+++");
+          if (count < 6) {
+            count++;
+            angle -= 10 * 6 / 180 * Math.PI;
+          }
+        });
+        
+        function init() {
+          scene = new THREE.Scene();
+          renderer = new THREE.WebGLRenderer();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setClearColor(0x888888);
+          document.body.appendChild(renderer.domElement);
+        
+          camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1e6);
+          camera.position.z = 150;
+          let controls = new THREE.OrbitControls(camera, renderer.domElement);
+          let axes = new THREE.AxesHelper(30);
+          scene.add(axes);
+          window.addEventListener('resize', onWindowResize, false);
+          ///////////////////////////////////////////////////////////////////////
+         
+          
+          var center = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 3, 36), new THREE.MeshBasicMaterial({color:'#C19D7A'
+          }));
+          center.rotation.x = Math.PI / 2;
+          
+          var boarder = new THREE.Mesh(new THREE.TorusGeometry(50, 1, 20, 120), new THREE.MeshBasicMaterial({color:'#444444'
+          }))
+          boarder.position.z = -3;
+          var boarder2 = new THREE.Mesh(new THREE.TorusGeometry(50, 1, 20, 120), new THREE.MeshBasicMaterial({color:'#444444'
+          }))
+					boarder2.position.z = 3;
+          
+          var top = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 10), new THREE.MeshBasicMaterial({color:'#783F04'
+          }))
+          top.position.y = 50;
+          var bot = new THREE.Mesh(new THREE.BoxGeometry(8, 4, 10), new THREE.MeshBasicMaterial({color:'#783F04'
+          }))
+          bot.position.y = -50;
+
+          var geometry = new THREE.BoxGeometry(0.5, 40, 0.5);
+					var material = new THREE.MeshBasicMaterial({ color: '#000000' });
+					second = new THREE.Mesh(geometry, material);
+					second.position.set(0, 20, 2);
+					group = new THREE.Group();
+					group.add(second);
+					scene.add(group);
+          scene.add(center);
+          scene.add(boarder);
+          scene.add(boarder2);
+          scene.add(top);
+          scene.add(bot);
+        }
+        
+        function onWindowResize() {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+          if(time > 0 && time < 1000){
+              turn = !turn;
+          }else if(time > 1001){
+              angle = 0;
+              count = 0;
+          }
+          time = 0;
+          second.material.polygonOffset = false;
+          group.position.z = 0.01;
+          camera.near = 1;
+          camera.far = 1e4;
+          camera.updateProjectionMatrix();
+
+
+          if (strategy === 'sol1') {
+            if (turn == true  && angle < 0) {
+              angle += Math.PI * 2 / 60 / 60;
+              clock_turn = true;
+              time_count++;
+              //console.log(count);
+        
+              if (time_count > 565) {								
+              	time_count -= 565;
+                count--;
+              }
+            }
+        
+            if (angle >= 0) {
+                if(clock_turn){
+                document.getElementById('alarm').play();
+                clock_turn = !clock_turn;
+              }
+              count = 0;
+              turn = false;
+            }
+            //requestAnimationFrame(animate);
+        
+          } else if (strategy === 'sol2') {
+            //console.log("into quartz");
+              if (turn === true && angle < 0) {
+                clock_turn = true;
+             		angle += Math.PI * 2 / 60;
+              	time_count += 56.5;
+                //console.log(turn);
+              //console.log("doing quartz");
+             // setTimeout(() => { animate() }, 1000);
+            }
+            if (time_count > 565) {								
+              	time_count -= 565;
+                count--;
+              }
+            if (angle >= 0) {
+              count = 0;
+              turn = false;
+              if(clock_turn){
+                document.getElementById('alarm').play();
+                clock_turn = !clock_turn;
+            }
+            }
+            //console.log("bottom of quartz");
+          }
+        
+          group.rotation.z = angle;
+          if (strategy === 'sol2'){
+            setTimeout(() => { animate() }, 1000);
+          }else
+            requestAnimationFrame(animate);
+          renderer.render(scene, camera);
+        }
+        </script>
+</body>
+</html>
