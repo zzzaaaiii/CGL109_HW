@@ -4,6 +4,6 @@
 
 各項狀態： ✅：已完成  ⏳：待繳交
 
- ●✅ [Christmas Tree Blinking, bottom](https://zzzaaaiii.github.io/CGL109_HW/HW0_train.html)
+ ●✅ [Train design](https://zzzaaaiii.github.io/CGL109_HW/HW0_train.html)
  
- ●✅ [HTML Input & Vector3 API](https://zzzaaaiii.github.io/CGL109_HW/HW1_clock.html)
+ ●✅ [Clock design](https://zzzaaaiii.github.io/CGL109_HW/HW1_clock.html)
