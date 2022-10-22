@@ -1,4 +1,4 @@
-<strong>可以點選[這裡](https://zzzaaaiii.github.io/W3D_hw/index.html)跳轉到"CGL"_Homework首頁<strong>
+<strong>可以點選[這裡](https://zzzaaaiii.github.io/CGL109_HW/index.html)跳轉到"CGL"_Homework首頁<strong>
 
 如有任何問題，請發送信件到此信箱：jasper890212@gmail.com
 
