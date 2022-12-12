@@ -76,4 +76,4 @@ function buildCar() {
     return group;
   }
 
-  export {buildCar}
+  export { buildCar }

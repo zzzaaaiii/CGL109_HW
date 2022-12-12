@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdn.skypack.dev/three';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136/examples/jsm/controls/OrbitControls.js';
-import { buildCar } from './buildCar';
+import { buildCar } from './buildCar.js';
 
 var camera, scene, renderer;
 
@@ -22,7 +22,7 @@ function init() {
 
   camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.set(0, 400, 300); // camera at (0,0,500)
-  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+  let controls = new OrbitControls(camera, renderer.domElement);
 
   ////////////////////////////////////////////////////////
   var gridXZ = new THREE.GridHelper(300, 30, 'red', 'white');
