@@ -11,9 +11,6 @@ var ts = clock.getElapsedTime();
 var car, ry = Math.PI / 2, rx = 0;
 var car1, car2, car3, car4, car5, car6, car7, car8, car9, car10, car11;
 
-init();
-animate();
-
 function init() {
 
   scene = new THREE.Scene();
