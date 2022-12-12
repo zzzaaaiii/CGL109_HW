@@ -86,8 +86,8 @@
           camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1e6);
           camera.position.z = 150;
           let controls = new THREE.OrbitControls(camera, renderer.domElement);
-          let axes = new THREE.AxesHelper(30);
-          scene.add(axes);
+          /*let axes = new THREE.AxesHelper(30);
+          scene.add(axes);*/
           window.addEventListener('resize', onWindowResize, false);
           ///////////////////////////////////////////////////////////////////////
          

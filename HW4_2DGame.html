@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>drive</title>
+
+    <style>
+        #info {
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        color: #ffff00
+        }
+
+        body {
+        overflow: hidden;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="info">Texture Map
+    </div>
+    
+    <script src="https://threejs.org/build/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
+    <script>
+
+
+    var camera, scene, renderer;
+    var bgtexture;
+    var keyboard = new KeyboardState();
+    var clock, mode = 1, did = false;
+    var mesh;
+    var count = 6, turn = false,premode = 1, s = true;
+    var texMat, texMat2, bg;
+
+    init();
+    animate();
+
+    /*function buildGeometry() {
+
+      var geometry = new THREE.BufferGeometry();
+      let vertices = [];
+      let uvs = [];
+      let indices = [0,1,2, 0,2,3];
+      vertices.push(-window.innerWidth / 6,-window.innerHeight / 5,0, window.innerWidth / 6,-window.innerHeight / 5,0, window.innerWidth / 6,window.innerHeight / 5,0, -window.innerWidth / 6,window.innerHeight / 5,0);
+      uvs.push (0,0.75, 0.165,0.75, 0.165,1, 0,1);
+      
+      geometry.setIndex(indices);
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      
+      geometry.computeBoundingSphere();
+      //geometry.computeFaceNormals();
+      geometry.computeVertexNormals();
+      return geometry;
+    }*/
+
+
+    function init() {
+      clock = new THREE.Clock();
+      renderer = new THREE.WebGLRenderer({
+        antialias: true
+      });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      scene = new THREE.Scene();
+      camera = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2,  window.innerHeight / 2,  -window.innerHeight / 2, -10, 100);
+      camera.position.z = 10;
+      window.addEventListener('resize', onWindowResize, false);
+
+      /////////////////////////////////////////////////////////////////////
+      let bgLoader = new THREE.TextureLoader();
+      bgLoader.crossOrigin = '';
+      bgtexture = bgLoader.load('https://i.imgur.com/qrP5VDP.jpg');
+      bgtexture.wrapS = THREE.RepeatWrapping;
+
+      // Plane with default texture coordinates [0,1]x[0,1]
+      texMat = new THREE.MeshBasicMaterial({
+        map: bgtexture
+      });
+      bg = new THREE.Mesh(new THREE.PlaneGeometry(window.innerWidth, window.innerHeight), texMat);
+      bg.position.z = 9;
+      scene.add(bg);
+      
+      /////////////////////////////////////////////////////////////////////
+      
+      let playerLoader = new THREE.TextureLoader();
+      playerLoader.load(
+      // resource URL
+        'https://i.imgur.com/9ta0ISR.png',
+        // Function when resource is loaded
+        function(texture) { // onLoad ...
+        // do something with the texture
+        // Plane with default texture coordinates [0,1]x[0,1]
+        texMat2 = new THREE.MeshBasicMaterial({
+            side: THREE.DoubleSide,
+            map: texture
+          });
+          //mesh = new THREE.Mesh(buildGeometry(), texMat);
+          texMat2.transparent = true;
+          mesh = new THREE.Mesh (new THREE.PlaneGeometry(window.innerWidth / 4.5,window.innerHeight / 3), texMat2);
+          mesh.position.z = 9.1;
+          mesh.position.y = -window.innerHeight / 10;
+          
+          scene.add(mesh);
+          texture.wrapS = THREE.RepeatWrapping;
+          texture.wrapT = THREE.RepeatWrapping;
+          texture.repeat.set (1/6, 1/4);
+          texture.offset.set (0, 3/4);
+        },
+        undefined, // onProgress ... not implemented
+        function(xhr) {  // onError
+          console.log('An error happened');
+        }
+      );
+
+      //window.addEventListener('resize', onWindowResize, false);
+    }
+
+    //window.addEventListener('resize', onWindowResize, false);
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      window.location.reload();
+      console.log("123456");
+    }
+
+    function textureAnimate() {
+      textureAnimate.count = (textureAnimate.count === undefined) ? 1 : textureAnimate.count;
+
+      if (mesh) {
+      
+      var texture = mesh.material.map;
+      //console.log (`${textureAnimate.count}: [${texture.offset.x},${texture.offset.y}]`);
+      if(s){
+        mesh.rotation.y = 0;
+      }else{
+        mesh.rotation.y = Math.PI;
+      }
+      
+      if(premode != mode){
+        did = false;
+        textureAnimate.count = 1;
+        texture.offset.x *= 0;
+        premode = mode;
+      }
+        texture.offset.x += 0.1666666;
+        if(mode == 1){
+          texture.offset.y = 0.75;
+          if(textureAnimate.count % 5 === 0){
+            texture.offset.x += 0.1666666;
+          }
+        }else if (mode == 2){
+          if(!did){
+            texture.offset.y = 0.25;
+            did = true;
+          }
+          texture.offset.x += 0.1666666;
+        }else if (mode == 3){
+          if(!did){
+            mesh.rotation.y = Math.PI;
+            texture.offset.y = 0.25;
+            did = true;
+          }
+          texture.offset.x += 0.1666666;
+        }else if (mode == 4){
+          turn = true;
+          if(!did){
+            if(keyboard.pressed("right")){
+              mesh.rotation.y = Math.PI;
+            }
+            //mesh.rotation.y = Math.PI;
+            texture.offset.y = 0.5;  
+            did = true;
+          }
+          if(textureAnimate.count % 5 === 0){
+            turn = false;
+            texture.offset.x += 0.1666666;
+          }
+          if(textureAnimate.count % 5 > 3 || textureAnimate.count % 5 === 0){
+            mesh.position.y -= window.innerHeight / 6;
+          }else if(textureAnimate.count % 5 < 3){
+            mesh.position.y += window.innerHeight / 6;
+          }
+          
+        }
+
+        textureAnimate.count++;
+        count = textureAnimate.count;
+      }
+    }
+
+    function animate() {
+      keyboard.update();
+      if (keyboard.pressed("right")){
+        if(count % 6 != 0 && turn == true) mode = 4;
+        else if(keyboard.pressed("space")) mode = 4;
+        else mode = 3;
+        
+        if(mesh.position.x < window.innerWidth / 3.5){
+          mesh.position.x += window.innerWidth / 24;
+        }else{
+           bgtexture.offset.x += 1/24;
+        //console.log(window.innerWidth, mesh.position.x);
+      }
+        s = false;
+      }
+      else if (keyboard.pressed("left")){
+        if(count % 6 != 0 && turn == true) mode = 4;
+        else if(keyboard.pressed("space")) mode = 4;
+        else mode = 2;
+        if(mesh.position.x > -window.innerWidth / 3.5){
+          mesh.position.x -= window.innerWidth / 24; 
+        }else{
+          bgtexture.offset.x -= 1/24;
+          //console.log(window.innerWidth, mesh.position.x);
+        }
+        s = true;
+      }else if(keyboard.pressed("space") || (count % 6 != 0 && turn == true)){
+        mode = 4;
+      }else{
+      mode = 1;
+      }
+      setTimeout(() => { textureAnimate() }, 100);
+      setTimeout(() => { animate() }, 100);
+      render();
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    </script>
+</body>
+
+</html>
